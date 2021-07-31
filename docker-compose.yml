@@ -1,12 +1,12 @@
 version: "3"
 
 networks:
-  laravel:
+  app-network:
 
 services:
   nginx:
     image: nginx:stable-alpine
-    container_name: web
+    #container_name: web
     ports:
       - "8080:80"
     volumes:
@@ -14,70 +14,73 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - php
-      - mysql
+      - database
     networks:
-      - laravel
+      - app-network
+    links:
+      - php
 
-  mysql:
-    image: mysql:5.7.29
-    container_name: db
-    restart: unless-stopped
-    tty: true
+  database:
+    image: postgres:alpine
+    #container_name: postgres
+    restart: "always"
     ports:
-      - "9306:3306"
+      - "${DB_PORT}:5432"
     environment:
-      MYSQL_DATABASE: laravel_db
-      MYSQL_USER: laravel_db
-      MYSQL_PASSWORD: 123456789
-      MYSQL_ROOT_PASSWORD: 123456789
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_DATABASE}
     networks:
-      - laravel
+      - app-network
     volumes:
-      - ./docker/mysql:/var/lib/mysql
+      - "./docker/dbdata:/var/lib/postgresql/data"
 
   php:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: app
+    #container_name: app
     volumes:
       - ./:/var/www/html
-    ports:
-      - "9004:9004"
     networks:
-      - laravel
+      - app-network
 
   composer:
     image: composer:latest
-    container_name: composer
+    #container_name: composer
     volumes:
       - ./:/var/www/html
     working_dir: /var/www/html
     depends_on:
       - php
     networks:
-      - laravel
+      - app-network
 
   npm:
     image: node:lts
-    container_name: node
+    #container_name: node
     volumes:
       - ./:/var/www/html
     working_dir: /var/www/html
     entrypoint: ["npm"]
+    depends_on:
+      - php
+    networks:
+      - app-network
 
   artisan:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: artisan
+    #container_name: artisan
     volumes:
       - ./:/var/www/html
     depends_on:
-      - mysql
+      - database
     working_dir: /var/www/html
     entrypoint: ["php", "/var/www/html/artisan"]
     networks:
-      - laravel
+      - app-network
+
+volumes:
+  dbdata:

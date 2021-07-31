@@ -1,23 +1,56 @@
-up:
-	docker-compose up -d
-down:
-	docker-compose down
-down-all:
-	docker-compose down --rmi all --volumes
-build:
-	docker-compose up -d --build
-setup-laravel:
-	docker-compose exec app php artisan key:generate
-	docker-compose exec app php artisan storage:link
-	docker-compose exec app chmod -R 777 storage bootstrap/cache
-migrate:
-	docker-compose exec app php artisan migrate
-migrate-fresh:
-	docker-compose exec app php artisan migrate:fresh --seed
+PHP := php
 
-# commands:
-#     docker-compose exec app composer install
-#     docker-compose exec app composer update
-#     ln -s public html
-#     docker-compose run --rm node install
-#     docker-compose run --rm node run server
+help:
+	@echo ""
+	# @echo "make install          ; install the project"
+	# @echo "make clean            ; clean project"
+	@echo "make up-dev             ; run project in local machine"
+	@echo "make up-prod            ; run project in production machine"
+	@echo "make up            		 ; run project"
+	@echo "make restart            ; run restart project"
+	# @echo "make stop             ; stop project"
+	# @echo "make build            ; build project"
+	# @echo "make shell            ; build and start interactive shell in php containers"
+	# @echo "make composer-install ; run composer-install inside containers"
+	# @echo "make composer-update  ; run composer-update inside containers"
+	# @echo "make asset            ; build and install javascript modules"
+	# @echo "make node-sh          ; build and start interactive shell in node containers"
+	# @echo "make build            ; run docker-compose build"
+	@echo "make down               ; run docker-compose down"
+	@echo ""
+
+build:
+	@docker-compose build
+up:
+	@docker-compose up -d
+restart:
+	@docker-compose restart
+down:
+	@docker-compose down
+deploy:
+	@docker-compose down
+	@docker-compose build
+	@docker-compose up -d
+update:
+	@docker-compose run --rm composer update
+update-no-reqs:
+	@docker-compose run composer update --ignore-platform-reqs
+setup-laravel:
+	@docker-compose run --rm artisan key:generate
+	@docker-compose run --rm artisan storage:link
+	@docker-compose run php chmod -R 777 storage bootstrap/cache
+migrate:
+	@docker-compose run --rm artisan migrate
+migrate-fresh:
+	@docker-compose run --rm artisan migrate:fresh --seed
+npm-install:
+	@docker-compose run --rm npm install
+node-start:
+	@docker-compose run --rm npm run start
+node-dev:
+	@docker-compose run --rm npm run dev:server
+node-server:
+	@docker-compose run npm run prod:server
+create-project:
+	@docker-compose run --rm composer create-project --prefer-dist laravel/laravel .
+
