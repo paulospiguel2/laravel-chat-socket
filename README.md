@@ -29,6 +29,9 @@ make composer-install
 ```
 make setup-laravel
 ```
+```
+make build-css
+```
 
 ```
 make npm-install
@@ -38,9 +41,6 @@ make npm-install
 make node-dev
 ```
 
-```
-make build-css
-```
 
 ### Makefile Commands
 
