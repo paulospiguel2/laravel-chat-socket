@@ -31,9 +31,11 @@ deploy:
 	@docker-compose down
 	@docker-compose build
 	@docker-compose up -d
-update:
+composer-install:
+	@docker-compose run --rm composer install
+composer-update:
 	@docker-compose run --rm composer update
-update-no-reqs:
+composer-update-no-reqs:
 	@docker-compose run composer update --ignore-platform-reqs
 setup-laravel:
 	@docker-compose run --rm artisan key:generate
@@ -51,6 +53,8 @@ node-dev:
 	@docker-compose run --rm npm run dev:server
 node-server:
 	@docker-compose run npm run prod:server
+build-css:
+	@docker-compose run npm run dev
 create-project:
 	@docker-compose run --rm composer create-project --prefer-dist laravel/laravel .
 
