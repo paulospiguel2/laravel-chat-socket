@@ -5,7 +5,16 @@ const http = require("http");
 
 const app = express();
 
-app.use(cors());
+app.use(
+    cors({
+        origin: "*",
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        preflightContinue: false,
+        optionsSuccessStatus: 204
+    })
+);
+
+app.options("*", cors());
 
 const server = http.createServer(app);
 

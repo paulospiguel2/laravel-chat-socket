@@ -1,11 +1,9 @@
 version: "3"
 
-networks:
-  app-network:
-
 services:
   nginx:
     image: nginx:stable-alpine
+    restart: unless-stopped
     #container_name: web
     ports:
       - "8080:80"
@@ -14,31 +12,32 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - php
-      - database
+      # - database
     networks:
       - app-network
     links:
       - php
 
-  database:
-    image: postgres:alpine
-    #container_name: postgres
-    restart: "always"
-    ports:
-      - "${DB_PORT}:5432"
-    environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_DB: ${DB_DATABASE}
-    networks:
-      - app-network
-    volumes:
-      - "./docker/dbdata:/var/lib/postgresql/data"
+  # database:
+  #   image: postgres:alpine
+  #   #container_name: postgres
+  #   restart: unless-stopped
+  #   ports:
+  #     - "${DB_PORT}:5432"
+  #   environment:
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #     POSTGRES_USER: ${DB_USERNAME}
+  #     POSTGRES_DB: ${DB_DATABASE}
+  #   networks:
+  #     - app-network
+  #   volumes:
+  #     - "./docker/dbdata:/var/lib/postgresql/data"
 
   php:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: unless-stopped
     #container_name: app
     volumes:
       - ./:/var/www/html
@@ -58,6 +57,7 @@ services:
 
   npm:
     image: node:lts
+    restart: unless-stopped
     #container_name: node
     volumes:
       - ./:/var/www/html
@@ -73,14 +73,19 @@ services:
       context: .
       dockerfile: Dockerfile
     #container_name: artisan
+    restart: unless-stopped
     volumes:
       - ./:/var/www/html
-    depends_on:
-      - database
+    # depends_on:
+    #   - database
     working_dir: /var/www/html
     entrypoint: ["php", "/var/www/html/artisan"]
     networks:
       - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   dbdata:
