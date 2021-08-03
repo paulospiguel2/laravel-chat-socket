@@ -12,7 +12,6 @@
 
     <title>Chat Laravel</title>
 
-    <script src="https://cdn.socket.io/3.1.3/socket.io.min.js"></script>
 </head>
 <body>
 
@@ -27,21 +26,34 @@
     </div>
 </section>
 
+<!-- @php
+$host = explode(":", request()->getHttpHost())
+@endphp
 
+<script src="{{request()->getScheme()}}://{{$host[0]}}:3000/socket.io/socket.io.js"></script>
+ -->
+<script src="https://cdn.socket.io/3.1.3/socket.io.min.js"></script>
 
 <script>
-    (()=>{
+    (() => {
         console.log("🔰 inicialized websocket(socket.io)]");
-        let ip_address = "127.0.0.1";
+        let host_address = `${window.location.protocol}//${window.location.hostname}`;
         let socket_port = "3000";
-        let socket = io(`${ip_address}`);
+        let socket = io(`${host_address}:${socket_port}`);
 
-        socket.on("connection",() => {
-            alert("Connected");
+        console.log("[host]", host_address);
+        console.log("[check 1]", socket.connected);
+
+        socket.on("connection", () => {
+            console.log("[check 2]", socket.connected);
             socket.emit("user_connected", 123456);
         });
 
-    })()
+        socket.on("connect", function() {
+            console.log("Connected!");
+        });
+    })();
 </script>
+
 </body>
 </html>

@@ -5,21 +5,26 @@ const http = require("http");
 
 const app = express();
 
-app.use(
-    cors({
+app.use(cors());
+
+/* app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header(
+        "Access-Control-Allow-Methods",
+        "PUT, GET, POST, DELETE, OPTIONS"
+    );
+    next();
+}); */
+
+const httpServer = http.createServer(app);
+
+const io = require("socket.io")(httpServer, {
+    cors: {
         origin: "*",
-        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-        preflightContinue: false,
-        optionsSuccessStatus: 204
-    })
-);
-
-app.options("*", cors());
-
-const server = http.createServer(app);
-
-const io = require("socket.io")(server, {
-    cors: { origin: "*", methods: ["GET", "POST"] }
+        methods: ["GET", "POST"]
+    }
 });
 
 const clients = [];
@@ -44,7 +49,7 @@ app.get("/", (req, res) => {
 /**
  * Initialize Server
  */
-server.listen(3000, function() {
+httpServer.listen(3000, function() {
     console.log("Server is running 🚀");
 });
 
