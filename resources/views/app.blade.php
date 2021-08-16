@@ -32,7 +32,8 @@ $host = explode(":", request()->getHttpHost())
 
 <script src="{{request()->getScheme()}}://{{$host[0]}}:3000/socket.io/socket.io.js"></script>
  -->
-<script src="https://cdn.socket.io/3.1.3/socket.io.min.js"></script>
+<!-- <script src="https://cdn.socket.io/3.1.3/socket.io.min.js"></script> -->
+<script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
 
 <script>
     (() => {
@@ -46,7 +47,7 @@ $host = explode(":", request()->getHttpHost())
 
         socket.on("connection", () => {
             console.log("[check 2]", socket.connected);
-            socket.emit("user_connected", 123456);
+            socket.emit("user_connected", '{{csrf_token()}}');
         });
 
         socket.on("connect", function() {
@@ -54,6 +55,8 @@ $host = explode(":", request()->getHttpHost())
         });
     })();
 </script>
+
+ <script src="{{ mix('js/socket.io.js') }}"></script>
 
 </body>
 </html>
